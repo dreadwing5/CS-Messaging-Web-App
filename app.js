@@ -9,8 +9,10 @@ const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
 const conversationRouter = require('./routes/conversationRoutes');
 const messageRouter = require('./routes/messageRoutes');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 
 //1) GLOBAL MIDDLEWARE
 
