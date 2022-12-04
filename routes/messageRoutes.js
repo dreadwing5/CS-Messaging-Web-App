@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const Message = require('../models/messageModel');
 const Conversation = require('../models/conversationModel');
+const User = require('../models/userModel');
 
 //new message
 router.post('/', async (req, res) => {
@@ -24,6 +25,56 @@ router.post('/', async (req, res) => {
   }
 });
 
+//send one of the saves message of user
+
+router.post('/:userID', async (req, res) => {
+  try {
+    const messages = await Message.find({
+      senderId: req.params.userID,
+      sendStatus: 0,
+    })
+      .sort({ sendTime: 1 })
+      .limit(1);
+
+    if (messages.length > 0) {
+      message = messages[0];
+
+      // broadcast this message to all available agents
+      // update the message status to sent
+      message.sendStatus = 1;
+      await message.save();
+    } else {
+      console.log('No message to send');
+      return res.status(201).json('No message to send');
+    }
+
+    // now save the message to the conversation
+
+    // find the conversation of user, if not found create one
+
+    const conversation = await Conversation.findOne({
+      conversationId: req.params.userID,
+    });
+    if (!conversation) {
+      // create new conversation for the user
+      const newConversation = new Conversation({
+        conversationId: req.params.userID,
+        messages: [message._id],
+      });
+      newConversation.save();
+    } else {
+      // update the conversation
+      conversation.messages.push(message._id);
+      await conversation.save();
+    }
+
+    res.status(200).json(message);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
 //find all messages
 router.get('/:conversationId', async (req, res) => {
   try {
@@ -35,16 +86,5 @@ router.get('/:conversationId', async (req, res) => {
     res.status(500).json(err);
   }
 });
-
-// router.post('/simulate',async  (req, res)=>{
-
-//   try{
-//     const userId = await
-
-//   }catch{
-
-//   }
-
-// })
 
 module.exports = router;

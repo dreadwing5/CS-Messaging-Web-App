@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const Message = require('../models/messageModel');
 const User = require('../models/userModel');
+const Conversation = require('../models/conversationModel');
 
 dotenv.config({
   path: '../config.env',
@@ -64,6 +65,7 @@ const importData = async () => {
 
 const deleteData = async () => {
   try {
+    await Conversation.deleteMany();
     await User.deleteMany();
     await Message.deleteMany();
     console.log('Data successfully deleted!');
