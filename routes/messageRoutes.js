@@ -36,4 +36,15 @@ router.get('/:conversationId', async (req, res) => {
   }
 });
 
+// router.post('/simulate',async  (req, res)=>{
+
+//   try{
+//     const userId = await
+
+//   }catch{
+
+//   }
+
+// })
+
 module.exports = router;

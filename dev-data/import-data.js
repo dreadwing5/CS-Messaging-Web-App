@@ -2,6 +2,7 @@ const fs = require('fs');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const Message = require('../models/messageModel');
+const User = require('../models/userModel');
 
 dotenv.config({
   path: '../config.env',
@@ -32,6 +33,13 @@ const messages = JSON.parse(
 const date = new Date();
 const importData = async () => {
   try {
+    const users = Object.keys(messages);
+    for (const user_id of users) {
+      await User.create({
+        userID: user_id,
+      });
+    }
+
     for (const [key, values] of Object.entries(messages)) {
       for (const val of values) {
         const message = {
@@ -56,6 +64,7 @@ const importData = async () => {
 
 const deleteData = async () => {
   try {
+    await User.deleteMany();
     await Message.deleteMany();
     console.log('Data successfully deleted!');
     process.exit();
