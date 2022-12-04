@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import Message from './Message.jsx';
+import Message from './components/Message.jsx';
 import './App.css';
 
 function App() {
-  const [email, setEmail] = useState('');
+  const [userID, setUserID] = useState('');
   const [isAuth, setIsAuth] = useState(false);
+  const [isAgent, setIsAgent] = useState(false);
 
   const handleClick = async (e) => {
     e.preventDefault();
-
     try {
       const response = await fetch('http://localhost:8000/api/users/login', {
         method: 'POST',
@@ -16,11 +16,14 @@ function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email,
+          userID,
         }),
       });
-      const data = await response.json();
-      if (data.status === 'success') {
+      const res = await response.json();
+      if (res.status === 'success') {
+        if (res.data.user.role === 'agent') {
+          setIsAgent(true);
+        }
         setIsAuth(true);
       }
     } catch (err) {
@@ -38,17 +41,13 @@ function App() {
   return (
     <div className='App'>
       {isAuth ? (
-        <Message />
+        <Message userId={userID} />
       ) : (
         <form style={styles}>
           <label className='label' htmlFor='email'>
-            Email :{' '}
+            UserID :
           </label>
-          <input
-            type='Email'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <input value={userID} onChange={(e) => setUserID(e.target.value)} />
           <button onClick={handleClick}>Click</button>
         </form>
       )}
