@@ -1,17 +1,50 @@
+import { useState, useEffect } from 'react';
 import DashBoard from './components/DashBoard.jsx';
 import Login from './components/Login.jsx';
 import Home from './components/Home.jsx';
-import ChatRoom from './components/ChatRoomPage.jsx';
+import ChatPage from './components/ChatPage.jsx';
 import { Routes, Route, useNavigate } from 'react-router-dom';
+import io from 'socket.io-client';
 
 function App() {
+  const [socket, setSocket] = useState(null);
+  const [userId, setUserId] = useState('');
+
+  const setUpSocket = () => {
+    const token = localStorage.getItem('token');
+    if (token && !socket) {
+      const newSocket = io('http://localhost:8000', {
+        auth: {
+          token: localStorage.getItem('token'),
+        },
+      });
+
+      newSocket.on('disconnect', () => {
+        setSocket(null);
+        setTimeout(setUpSocket, 3000);
+      });
+      newSocket.on('connect', () => {
+        console.log('Connected');
+      });
+
+      setSocket(newSocket);
+    }
+  };
+
+  useEffect(() => {
+    setUpSocket();
+  }, []);
+
   return (
     <div className='App'>
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/dashboard' element={<DashBoard />} />
-        <Route path='/chatroom/:id' element={<ChatRoom />} />
+        <Route
+          path='/login'
+          element={<Login userID={userId} setUserID={setUserId} />}
+        />
+        <Route path='/dashboard/' element={<DashBoard socket={socket} />} />
+        <Route path='/thread/:id' element={<ChatPage socket={socket} />} />
       </Routes>
     </div>
   );

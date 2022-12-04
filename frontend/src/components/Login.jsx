@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
 
-function Login() {
-  const [userID, setUserID] = useState('');
+function Login({ userID, setUserID }) {
   const [isAuth, setIsAuth] = useState(false);
   const [isAgent, setIsAgent] = useState(false);
   const navigate = useNavigate();
@@ -24,6 +23,7 @@ function Login() {
       localStorage.setItem('token', res.token);
       if (res.status === 'success') {
         setIsAuth(true);
+        localStorage.setItem('userID', userID);
         // setIsAgent(true);
         navigate('/dashboard');
       }

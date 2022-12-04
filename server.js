@@ -6,6 +6,8 @@ const { promisify } = require('util');
 const AppError = require('./utils/appError');
 const User = require('./models/userModel');
 
+const online_agents = [];
+
 process.on('uncaughtException', (err) => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
   console.log(err);
@@ -49,7 +51,6 @@ const io = new Server(server, {
 io.use(async (socket, next) => {
   try {
     const token = socket.handshake.auth.token;
-    console.log(token);
     if (!token) {
       return next(
         new AppError('You are not logged in! Please log in to get access', 401)
@@ -57,25 +58,38 @@ io.use(async (socket, next) => {
     }
     // 2) Verification of token
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    console.log(decoded);
     const currentUser = await User.findById(decoded.id);
-    console.log(currentUser);
-    // if (!currentUser) {
-    //   return next(
-    //     new AppError('The user belonging to the token does not exist', 401)
-    //   );
-    //   next();
+    if (!currentUser) {
+      return next(
+        new AppError('The user belonging to the token does not exist', 401)
+      );
+    }
+    if (currentUser.role === 'agent') {
+      if (!online_agents.includes(socket.id)) {
+        online_agents.push(socket.id);
+        console.log(online_agents);
+      }
+    }
+    socket.userID = currentUser.userID;
+    next();
   } catch (err) {
     console.log(err);
   }
 });
 
 io.on('connection', (socket) => {
-  console.log(`New client connected : ${socket.id}`);
-
-  socket.on('message', (data) => {
-    console.log(data);
-    socket.broadcast.emit('receive_message', data);
+  socket.on('customer_message', (data) => {
+    for (let agent of online_agents) {
+      console.log(`Sending message to ${agent}`);
+      socket.to(agent).emit('customer_message', data);
+    }
+  });
+  socket.on('disconnect', () => {
+    console.log(`Client disconnected : ${socket.id}`);
+    const index = online_agents.indexOf(socket.userID);
+    if (index > -1) {
+      online_agents.splice(index, 1);
+    }
   });
 });
 
