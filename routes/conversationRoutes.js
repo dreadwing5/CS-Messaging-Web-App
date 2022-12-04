@@ -3,9 +3,29 @@ const Conversation = require('../models/conversationModel');
 
 //new conv
 
-router.post('/', async (req, res) => {
+router.get('/', async (req, res) => {
+  try {
+    const conversation = await Conversation.find({});
+    res.status(200).json(conversation);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.post('/:customerId', async (req, res) => {
+  //check if thread already exists
+  const conversation = await Conversation.findOne({
+    conversationId: req.params.customerId,
+  });
+
+  if (conversation) {
+    return res.status(400).json({ message: 'Conversation already exists' });
+  }
+
   const newConversation = new Conversation({
-    members: [req.body.senderId, req.body.receiverId],
+    conversationId: req.params.customerId,
+    messages: [],
+    status: 'active',
   });
 
   try {
@@ -16,30 +36,18 @@ router.post('/', async (req, res) => {
   }
 });
 
-//get conv of a user
-
-router.get('/:userId', async (req, res) => {
-  try {
-    const conversation = await Conversation.find({
-      members: { $in: [req.params.userId] },
-    });
-    res.status(200).json(conversation);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-// get conv includes two userId
-
-router.get('/find/:firstUserId/:secondUserId', async (req, res) => {
+//get conv of a customer
+router.get('/:customerId', async (req, res) => {
   try {
     const conversation = await Conversation.findOne({
-      members: { $all: [req.params.firstUserId, req.params.secondUserId] },
+      conversationId: req.params.customerId,
     });
     res.status(200).json(conversation);
   } catch (err) {
     res.status(500).json(err);
   }
 });
+
+// get conv of all users
 
 module.exports = router;
