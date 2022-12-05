@@ -75,7 +75,7 @@ router.post('/:userID', async (req, res) => {
   }
 });
 
-//find all messages
+//find all messages of a particular thread
 router.get('/:conversationId', async (req, res) => {
   try {
     const messages = await Message.find({

@@ -10,7 +10,7 @@ function App() {
   const [socket, setSocket] = useState(null);
   const [userId, setUserId] = useState('');
 
-  const setUpSocket = () => {
+  const setUpSocket = async () => {
     const token = localStorage.getItem('token');
     if (token && !socket) {
       const newSocket = io('http://localhost:8000', {
@@ -31,17 +31,19 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    setUpSocket();
-  }, []);
-
   return (
     <div className='App'>
       <Routes>
         <Route path='/' element={<Home />} />
         <Route
           path='/login'
-          element={<Login userID={userId} setUserID={setUserId} />}
+          element={
+            <Login
+              userID={userId}
+              setUserID={setUserId}
+              setUpSocket={setUpSocket}
+            />
+          }
         />
         <Route path='/dashboard/' element={<DashBoard socket={socket} />} />
         <Route path='/thread/:id' element={<ChatPage socket={socket} />} />

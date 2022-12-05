@@ -5,7 +5,6 @@ const ChatPage = ({ socket }) => {
   const { id } = useParams();
   const [messages, setMessages] = useState([]);
   const messageRef = useRef();
-
   const sendMessage = () => {
     console.log('sending message');
     if (socket) {
@@ -13,17 +12,26 @@ const ChatPage = ({ socket }) => {
         message: messageRef.current.value,
         conversationId: id,
       });
-      console.log('message sent');
       messageRef.current.value = '';
+      console.log('message sent');
     }
   };
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('customer_message', (message) => {
+        const newMessages = [...messages, message];
+        setMessages(newMessages);
+      });
+    }
+  }, [messages]);
 
   return (
     <>
       <h1>Messages : </h1>
       <div>
-        {messages.map((message) => (
-          <div key={message._id}>
+        {messages.map((message, i) => (
+          <div key={i}>
             <p>{message.message}</p>
           </div>
         ))}

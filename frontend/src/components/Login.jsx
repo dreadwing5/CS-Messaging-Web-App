@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
 
-function Login({ userID, setUserID }) {
+function Login({ userID, setUserID, setUpSocket }) {
   const [isAuth, setIsAuth] = useState(false);
   const [isAgent, setIsAgent] = useState(false);
   const navigate = useNavigate();
@@ -24,8 +24,12 @@ function Login({ userID, setUserID }) {
       if (res.status === 'success') {
         setIsAuth(true);
         localStorage.setItem('userID', userID);
-        // setIsAgent(true);
-        navigate('/dashboard');
+        setUpSocket();
+        if (res.data.user.role === 'customer') {
+          navigate(`/thread/${userID}`);
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (err) {
       console.log(err);
