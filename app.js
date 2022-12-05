@@ -54,7 +54,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/users', userRouter);
-app.use('/api/thread', conversationRouter);
+app.use('/api/conversations', conversationRouter);
 app.use('/api/messages', messageRouter);
 
 //Handle non-existing routes
