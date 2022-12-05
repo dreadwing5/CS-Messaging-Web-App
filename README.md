@@ -1,13 +1,13 @@
-#Features added
+# Features added
 
 - Added feature for customer to send message to multiple agents
 - Saved the given dataset in mongodb database
 - Added endpoint for simulating a customer request in streamlined fashion
 - Added socket.io for real time communication between customer and agent
 
-##Endpoints
+## Endpoints
 
-###Messages
+### Messages
 
 - /api/messages
   method: POST
@@ -22,7 +22,7 @@
   method: Post
   description: Simulate request from customer using predefined dataset
 
-###Thread
+### Thread
 
 - /api/threads
   method: GET
@@ -36,7 +36,7 @@
   method: GET
   description: Get all thread of a particular thread
 
-###Users
+### Users
 
 - /api/users
   method: GET
@@ -50,10 +50,10 @@
   }
   description: Create a new user with specified role
 
-###API Examples
+### API Examples
 
-![Simulating Request](http://https://github.com/dreadwing5/CS-Messaging-Web-App/screenshots/1.png)
+![Simulating Request](./screenshots/1.png)
 
-![Create new Message](http://https://github.com/dreadwing5/CS-Messaging-Web-App/screenshots/2.png)
+![Create new Message](./screenshots/2.png)
 
-![Get all messages](http://https://github.com/dreadwing5/CS-Messaging-Web-App/screenshots/3.png)
+![Get all messages](./screenshots/3.png)
