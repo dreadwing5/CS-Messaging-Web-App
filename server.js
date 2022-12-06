@@ -1,6 +1,7 @@
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const AppError = require('./utils/appError');
+const { Server } = require('socket.io');
 
 process.on('uncaughtException', (err) => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
@@ -33,6 +34,31 @@ const port = process.env.PORT || 3000;
 
 const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);
+});
+
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_HOST,
+    methods: ['GET', 'POST'],
+  },
+});
+
+io.on('connection', (socket) => {
+  socket.on('join_room', (data) => {
+    socket.join(data);
+  });
+
+  socket.on('leave_room', (room) => {
+    socket.leave(room);
+  });
+
+  //send and get message
+  socket.on('sendMessage', ({ sender, room, text }) => {
+    io.to(room).emit('getMessage', {
+      sender,
+      text,
+    });
+  });
 });
 
 process.on('unhandledRejection', (err) => {
