@@ -29,6 +29,11 @@ io.on('connection', (socket) => {
     io.emit('getUsers', users);
   });
 
+  socket.on('join_room', (data) => {
+    socket.join(data);
+    console.log(`user with ${socket.id} joined room ${data}`);
+  });
+
   //send and get message
   socket.on('sendMessage', ({ senderId, receiverId, text }) => {
     const user = getUser(receiverId);

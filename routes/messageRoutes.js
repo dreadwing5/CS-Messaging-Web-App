@@ -6,8 +6,8 @@ const User = require('../models/userModel');
 //new message
 router.post('/', async (req, res) => {
   const newMessage = {
-    conversationId: req.body.userId,
-    senderId: req.body.userId,
+    conversationId: req.body.conversationId,
+    senderId: req.body.senderId,
     text: req.body.text,
     sendStatus: 1,
   };
@@ -80,6 +80,7 @@ router.get('/:conversationId', async (req, res) => {
   try {
     const messages = await Message.find({
       conversationId: req.params.conversationId,
+      sendStatus: 1,
     });
     res.status(200).json(messages);
   } catch (err) {
