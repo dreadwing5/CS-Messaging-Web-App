@@ -31,14 +31,17 @@ io.on('connection', (socket) => {
 
   socket.on('join_room', (data) => {
     socket.join(data);
-    console.log(`user with ${socket.id} joined room ${data}`);
+  });
+
+  socket.on('leave_room', (room) => {
+    console.log('user left the room');
+    socket.leave(room);
   });
 
   //send and get message
-  socket.on('sendMessage', ({ senderId, receiverId, text }) => {
-    const user = getUser(receiverId);
-    io.to(user.socketId).emit('getMessage', {
-      senderId,
+  socket.on('sendMessage', ({ sender, room, text }) => {
+    io.to(room).emit('getMessage', {
+      sender,
       text,
     });
   });
@@ -47,6 +50,5 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('a user disconnected!');
     removeUser(socket.id);
-    io.emit('getUsers', users);
   });
 });
